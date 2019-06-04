@@ -10,9 +10,11 @@ config :deploy_demo, DemoWeb.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :deploy_demo, Demo.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "deploy_demo_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+
+config :deploy_demo, Demo.Repo, pool: Ecto.Adapters.SQL.Sandbox
+
+if url = System.get_env("DATABASE_URL") do
+  config :deploy_demo, Demo.Repo, url: url
+else
+  config :deploy_demo, Demo.Repo, database: "deploy_demo_test"
+end
