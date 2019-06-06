@@ -29,7 +29,8 @@ blocks:
         - name: "Compile and deploy"
           commands:
             - mix compile
-            # TODO assets
+            - cd assets && yarn && yarn deploy && cd ..
+            - mix phx.digest
             - mix release --env=prod --verbose
             # setups the key
             - chmod 600 ~/.ssh/ec2.pem

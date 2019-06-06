@@ -8,8 +8,6 @@ agent:
 blocks:
   - name: Prepare
     task:
-      secrets:
-        - name: ec2-pem
       jobs:
         - name: compile, static checks
           commands:
