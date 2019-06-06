@@ -26,6 +26,7 @@ blocks:
           - mix local.rebar --force
           - cache restore mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
           - cache restore mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+          - cache restore mix-release-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
       # epilogue:
       #   commands:
       #     - cache store mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) _build
@@ -36,6 +37,7 @@ blocks:
             - cd assets && yarn && yarn deploy && cd ..
             - mix phx.digest
             - mix release --env=prod --verbose
+            - cache store mix-release-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) _build/prod
             # setups the key
             - chmod 600 ~/.ssh/ec2.pem
             - ssh-keyscan $EC2_IP_ADDRESS >> ~/.ssh/known_hosts
