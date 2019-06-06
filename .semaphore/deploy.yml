@@ -1,0 +1,48 @@
+version: v1.0
+name: Deploy
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: Deploys the release
+    task:
+      secrets:
+        - name: ec2-pem
+      env_vars:
+        - name: MIX_ENV
+          value: prod
+      prologue:
+        commands:
+          - checkout
+          - sem-version elixir 1.8
+          - sem-version erlang 21.0
+          - mix local.hex --force
+          - mix local.rebar --force
+          - cache restore mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+          - cache restore mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+      # epilogue:
+      #   commands:
+      #     - cache store mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) _build
+      jobs:
+        - name: "Compile and deploy"
+          commands:
+            - mix compile
+            # TODO assets
+            - mix release --env=prod --verbose
+            # setups the key
+            - chmod 600 ~/.ssh/ec2.pem
+            - ssh-keyscan 18.195.112.134 >> ~/.ssh/known_hosts
+            # copies the release
+            - scp -i ~/.ssh/ec2.pem _build/prod/rel/deploy_demo/releases/0.1.0/deploy_demo.tar.gz ubuntu@18.195.112.134:~/releases
+            # restarts the release
+            # - |
+            #   ssh -i ~/.ssh/ec2.pem -T ubuntu@18.195.112.134 << EOF
+            #     mkdir -p releases/deploy_demo
+            #     tar -xzf releases/deploy_demo.tar.gz -C releases/deploy_demo
+            #     sudo systemd restart deploy
+            #   EOF
+            - ssh -i ~/.ssh/ec2.pem ubuntu@18.195.112.134 "mkdir -p releases/deploy_demo"
+            - ssh -i ~/.ssh/ec2.pem ubuntu@18.195.112.134 "tar -xzf releases/deploy_demo.tar.gz -C releases/deploy_demo"
+            - ssh -i ~/.ssh/ec2.pem -t ubuntu@18.195.112.134 "sudo systemctl restart deploy"
