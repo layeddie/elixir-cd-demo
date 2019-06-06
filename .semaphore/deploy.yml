@@ -13,6 +13,10 @@ blocks:
       env_vars:
         - name: MIX_ENV
           value: prod
+        - name: EC2_IP_ADDRESS
+          value: 18.195.112.134
+        - name: EC2_USER
+          value: ubuntu
       prologue:
         commands:
           - checkout
@@ -34,16 +38,16 @@ blocks:
             - mix release --env=prod --verbose
             # setups the key
             - chmod 600 ~/.ssh/ec2.pem
-            - ssh-keyscan 18.195.112.134 >> ~/.ssh/known_hosts
+            - ssh-keyscan $EC2_IP_ADDRESS >> ~/.ssh/known_hosts
             # copies the release
-            - scp -i ~/.ssh/ec2.pem _build/prod/rel/deploy_demo/releases/0.1.0/deploy_demo.tar.gz ubuntu@18.195.112.134:~/releases
+            - scp -i ~/.ssh/ec2.pem _build/prod/rel/deploy_demo/releases/0.1.0/deploy_demo.tar.gz $EC2_USER@$EC2_IP_ADDRESS:~/releases
             # restarts the release
             # - |
-            #   ssh -i ~/.ssh/ec2.pem -T ubuntu@18.195.112.134 << EOF
+            #   ssh -i ~/.ssh/ec2.pem -T $EC2_USER@$EC2_IP_ADDRESS << EOF
             #     mkdir -p releases/deploy_demo
             #     tar -xzf releases/deploy_demo.tar.gz -C releases/deploy_demo
             #     sudo systemd restart deploy
             #   EOF
-            - ssh -i ~/.ssh/ec2.pem ubuntu@18.195.112.134 "mkdir -p releases/deploy_demo"
-            - ssh -i ~/.ssh/ec2.pem ubuntu@18.195.112.134 "tar -xzf releases/deploy_demo.tar.gz -C releases/deploy_demo"
-            - ssh -i ~/.ssh/ec2.pem -t ubuntu@18.195.112.134 "sudo systemctl restart deploy"
+            - ssh -i ~/.ssh/ec2.pem $EC2_USER@$EC2_IP_ADDRESS "mkdir -p releases/deploy_demo"
+            - ssh -i ~/.ssh/ec2.pem $EC2_USER@$EC2_IP_ADDRESS "tar -xzf releases/deploy_demo.tar.gz -C releases/deploy_demo"
+            - ssh -i ~/.ssh/ec2.pem -t $EC2_USER@$EC2_IP_ADDRESS "sudo systemctl restart deploy"
