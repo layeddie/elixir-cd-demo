@@ -36,7 +36,7 @@ blocks:
             - mix compile
             - cd assets && yarn && yarn deploy && cd ..
             - mix phx.digest
-            - mix release --env=prod --verbose
+            - mix distillery.release --env=prod --verbose
             - cache store mix-release-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) _build/prod
             # setups the key
             - chmod 600 ~/.ssh/ec2.pem

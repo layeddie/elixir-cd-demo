@@ -1,4 +1,4 @@
-use Mix.Releases.Config,
+use Distillery.Releases.Config,
   default_release: :default,
   default_environment: Mix.env()
 
@@ -41,7 +41,7 @@ environment :prod do
 
   set(
     config_providers: [
-      {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
+      {Distillery.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
     ]
   )
 end
