@@ -25,11 +25,11 @@ blocks:
           - mix local.hex --force
           - mix local.rebar --force
           - cache restore mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
-          - cache restore mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
-          - cache restore mix-release-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+          - cache restore mix-build-$SEMAPHORE_GIT_BRANCH-$SEMAPHORE_GIT_SHA
+          - cache restore mix-release-$SEMAPHORE_GIT_BRANCH-$SEMAPHORE_GIT_SHA
       # epilogue:
       #   commands:
-      #     - cache store mix-build-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) _build
+      #     - cache store mix-build-$SEMAPHORE_GIT_BRANCH-$SEMAPHORE_GIT_SHA _build
       jobs:
         - name: "Compile and deploy"
           commands:
@@ -37,7 +37,7 @@ blocks:
             - cd assets && yarn && yarn deploy && cd ..
             - mix phx.digest
             - mix distillery.release --env=prod --verbose
-            - cache store mix-release-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) _build/prod
+            - cache store mix-release-$SEMAPHORE_GIT_BRANCH-$SEMAPHORE_GIT_SHA _build/prod
             # setups the key
             - chmod 600 ~/.ssh/ec2.pem
             - ssh-keyscan $EC2_IP_ADDRESS >> ~/.ssh/known_hosts
