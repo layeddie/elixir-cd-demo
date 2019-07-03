@@ -6,7 +6,7 @@ agent:
     os_image: ubuntu1804
   containers:
     - name: main
-      image: notseika/elixir-ci:1.9-alpine
+      image: notseika/elixir-ci:1.9-alpine@sha256:2e64d233784f5108c0e04bafa061d9c075e4a0c9d52f450f14d2314bbd4433f2
     - name: postgres
       image: postgres:11-alpine
 

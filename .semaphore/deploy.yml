@@ -6,7 +6,7 @@ agent:
     os_image: ubuntu1804
   containers:
     - name: main
-      image: notseika/elixir-ci:1.9-node
+      image: notseika/elixir-ci:1.9-node@sha256:5390b7f94cb7a22eeb917ade2dcc995447ce8869117072e805e3c2b0a425b279
 
 blocks:
   - name: Deploy
