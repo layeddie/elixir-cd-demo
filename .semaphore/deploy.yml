@@ -39,7 +39,7 @@ blocks:
             - mix phx.digest
             - mix distillery.release --env=prod --verbose
 
-            - cache store mix-release-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
+            - cache store mix-release-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) deps
             - cache store mix-release-build-$SEMAPHORE_GIT_BRANCH-$SEMAPHORE_GIT_SHA _build
             # setups the key
             - chmod 600 ~/.ssh/ec2.pem
