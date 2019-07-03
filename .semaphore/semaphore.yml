@@ -4,6 +4,11 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
+  containers:
+    - name: main
+      image: notseika/elixir-ci:1.9-alpine
+    - name: postgres
+      image: postgres:11-alpine
 
 blocks:
   - name: Prepare
@@ -12,8 +17,8 @@ blocks:
         - name: compile, static checks
           commands:
             - checkout
-            - sem-version elixir 1.8
-            - sem-version erlang 21.0
+            - elixir -v
+
             - mix local.hex --force
             - mix local.rebar --force
 
@@ -24,11 +29,9 @@ blocks:
             - mix do compile
             - MIX_ENV=test mix compile
 
-            # we can store deps only after compilation, otherwise rebar3 deps (that is, almost all erlang deps) won't be cached
             - cache store mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock) deps
             - cache store mix-build-$SEMAPHORE_GIT_BRANCH-$SEMAPHORE_GIT_SHA _build
 
-            # static checks
             - mix format --check-formatted
 
   - name: Test
@@ -36,8 +39,7 @@ blocks:
       prologue:
         commands:
           - checkout
-          - sem-version elixir 1.8
-          - sem-version erlang 21.0
+          - elixir -v
           - mix local.hex --force
           - mix local.rebar --force
           - cache restore mix-deps-$SEMAPHORE_GIT_BRANCH-$(checksum mix.lock)
@@ -46,9 +48,8 @@ blocks:
         - name: ex_unit
           env_vars:
             - name: DATABASE_URL
-              value: "ecto://postgres:@0.0.0.0:5432/demo_test"
+              value: "ecto://postgres:@postgres:5432/demo_test"
           commands:
-            - sem-service start postgres
             - mix test
 
 promotions:
